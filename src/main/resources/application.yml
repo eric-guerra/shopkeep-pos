@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/shopkeep?serverTimezone=UTC}
+    username: ${DB_USER:shopkeep}
+    password: ${DB_PASSWORD:shopkeep}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none   # Flyway owns the schema
+    properties:
+      hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+shopkeep:
+  tax-rate: 0.0825
+  allow-backorder: false
+  zone: America/Chicago
+  users:
+    cashier-password: ${CASHIER_PASSWORD:cashier}
+    manager-password: ${MANAGER_PASSWORD:manager}
