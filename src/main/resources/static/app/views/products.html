@@ -1,0 +1,58 @@
+<div class="split">
+    <section class="panel">
+        <div class="row">
+            <input ng-model="vm.query" ng-change="vm.load(0)" placeholder="Search products">
+            <button class="primary" ng-click="vm.newProduct()">New product</button>
+        </div>
+        <div class="alert" ng-show="vm.lowStock.length">
+            Low stock: <span ng-repeat="p in vm.lowStock">{{p.name}} ({{p.stockOnHand}}){{$last ? '' : ', '}}</span>
+        </div>
+        <table class="table">
+            <thead><tr><th>SKU</th><th>Name</th><th class="num">Price</th><th class="num">Margin</th><th class="num">On hand</th><th></th></tr></thead>
+            <tbody>
+            <tr ng-repeat="p in vm.page.content" ng-class="{low: p.stockOnHand <= p.reorderLevel}">
+                <td>{{p.sku}}</td>
+                <td><a href ng-click="vm.edit(p)">{{p.name}}</a><div class="muted">{{p.category}}</div></td>
+                <td class="num">{{p.priceCents | money}}</td>
+                <td class="num">{{vm.margin(p)}}%</td>
+                <td class="num">{{p.stockOnHand}}</td>
+                <td><button class="link danger" ng-click="vm.deactivate(p)">hide</button></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pager">
+            <button ng-disabled="vm.page.first" ng-click="vm.load(vm.page.number - 1)">&larr;</button>
+            page {{vm.page.number + 1}} of {{vm.page.totalPages}}
+            <button ng-disabled="vm.page.last" ng-click="vm.load(vm.page.number + 1)">&rarr;</button>
+        </div>
+    </section>
+
+    <section class="panel" ng-if="vm.editing">
+        <h2>{{vm.editing.id ? 'Edit' : 'New'}} product</h2>
+        <form ng-submit="vm.save()" class="stack">
+            <label>SKU <input ng-model="vm.editing.sku" required></label>
+            <label>Barcode <input ng-model="vm.editing.barcode"></label>
+            <label>Name <input ng-model="vm.editing.name" required></label>
+            <label>Category <input ng-model="vm.editing.category"></label>
+            <label>Price ($) <input type="number" step="0.01" min="0" ng-model="vm.editing.price" required></label>
+            <label>Cost ($) <input type="number" step="0.01" min="0" ng-model="vm.editing.cost" required></label>
+            <label><input type="checkbox" ng-model="vm.editing.taxable"> Taxable</label>
+            <label>Reorder level <input type="number" min="0" ng-model="vm.editing.reorderLevel"></label>
+            <label ng-if="!vm.editing.id">Initial stock <input type="number" min="0" ng-model="vm.editing.initialStock"></label>
+            <div class="row"><button class="primary">Save</button><button type="button" ng-click="vm.editing = null">Cancel</button></div>
+        </form>
+
+        <div ng-if="vm.editing.id">
+            <h3>Stock: {{vm.editing.stockOnHand}}</h3>
+            <form ng-submit="vm.adjust()" class="row">
+                <input type="number" ng-model="vm.adjustment.delta" placeholder="+/- qty" required class="qty">
+                <select ng-model="vm.adjustment.reason" ng-options="r for r in vm.reasons" required></select>
+                <input ng-model="vm.adjustment.note" placeholder="note">
+                <button>Apply</button>
+            </form>
+            <table class="table small">
+                <tr ng-repeat="m in vm.history"><td>{{m.createdAt | date:'short'}}</td><td>{{m.reason}}</td><td class="num">{{m.delta > 0 ? '+' : ''}}{{m.delta}}</td><td class="num">{{m.balanceAfter}}</td><td>{{m.reference}}</td><td>{{m.performedBy}}</td></tr>
+            </table>
+        </div>
+    </section>
+</div>
