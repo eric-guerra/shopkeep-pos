@@ -1,0 +1,63 @@
+<div class="register">
+    <section class="panel cart">
+        <form ng-submit="vm.scan()">
+            <input class="big" ng-model="vm.query" ng-change="vm.search()" placeholder="Scan barcode or search products" autofocus>
+        </form>
+        <ul class="results" ng-show="vm.results.length">
+            <li ng-repeat="p in vm.results" ng-click="vm.add(p)">
+                <strong>{{p.name}}</strong> <span class="muted">{{p.sku}}</span>
+                <span class="right">{{p.priceCents | money}} · {{p.stockOnHand}} left</span>
+            </li>
+        </ul>
+
+        <table class="table">
+            <thead><tr><th>Item</th><th>Qty</th><th>Disc %</th><th class="num">Total</th><th></th></tr></thead>
+            <tbody>
+            <tr ng-repeat="line in vm.cart">
+                <td>{{line.product.name}}<div class="muted">{{line.product.priceCents | money}} each</div></td>
+                <td><input type="number" min="1" ng-model="line.quantity" ng-change="vm.requote()" class="qty"></td>
+                <td><input type="number" min="0" max="100" ng-model="line.discountPercent" ng-change="vm.requote()" class="qty"></td>
+                <td class="num">{{vm.lineTotal($index) | money}}</td>
+                <td><button class="link danger" ng-click="vm.remove(line)">&times;</button></td>
+            </tr>
+            <tr ng-hide="vm.cart.length"><td colspan="5" class="muted center">Cart is empty</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel pay">
+        <dl class="totals" ng-if="vm.totals">
+            <dt>Subtotal</dt><dd>{{vm.totals.subtotalCents | money}}</dd>
+            <dt>Discounts</dt><dd>-{{vm.totals.discountCents | money}}</dd>
+            <dt>Tax</dt><dd>{{vm.totals.taxCents | money}}</dd>
+            <dt class="grand">Total</dt><dd class="grand">{{vm.totals.totalCents | money}}</dd>
+        </dl>
+        <label ng-show="me.manager">Order discount ($)
+            <input type="number" min="0" step="0.01" ng-model="vm.orderDiscount" ng-change="vm.requote()">
+        </label>
+        <div class="tabs">
+            <button ng-class="{active: vm.payment.method === 'CASH'}" ng-click="vm.payment.method = 'CASH'">Cash</button>
+            <button ng-class="{active: vm.payment.method === 'CARD'}" ng-click="vm.payment.method = 'CARD'">Card</button>
+        </div>
+        <div ng-show="vm.payment.method === 'CASH'">
+            <input type="number" step="0.01" min="0" ng-model="vm.payment.tendered" placeholder="Cash tendered">
+            <div class="quick">
+                <button ng-repeat="amt in vm.quickTender()" ng-click="vm.payment.tendered = (amt / 100).toFixed(2)">{{amt | money}}</button>
+            </div>
+            <p ng-show="vm.payment.tendered">Change due: <strong ng-class="{danger: vm.changeDue() < 0}">{{vm.changeDue() | money}}</strong></p>
+        </div>
+        <button class="primary big" ng-disabled="!vm.cart.length || vm.busy || (vm.payment.method === 'CASH' && vm.changeDue() < 0)" ng-click="vm.charge()">
+            Charge {{vm.totals.totalCents | money}}
+        </button>
+
+        <div class="receipt" ng-if="vm.lastSale">
+            <h3>Receipt {{vm.lastSale.receiptNo}}</h3>
+            <div ng-repeat="l in vm.lastSale.lines">{{l.quantity}} × {{l.name}} <span class="right">{{l.unitPriceCents * l.quantity - l.discountCents | money}}</span></div>
+            <hr>
+            <div>Tax <span class="right">{{vm.lastSale.taxCents | money}}</span></div>
+            <div><strong>Total <span class="right">{{vm.lastSale.totalCents | money}}</span></strong></div>
+            <div ng-if="vm.lastSale.paymentMethod === 'CASH'">Cash {{vm.lastSale.tenderedCents | money}} · Change {{vm.lastSale.changeCents | money}}</div>
+            <button class="link" ng-click="vm.printReceipt()">Print</button>
+        </div>
+    </section>
+</div>
