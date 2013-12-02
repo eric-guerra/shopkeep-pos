@@ -1,0 +1,26 @@
+<section class="panel">
+    <div class="row">
+        <h2>End of day</h2>
+        <input type="date" ng-model="vm.date" ng-change="vm.load()">
+    </div>
+    <div class="kpis" ng-if="vm.report">
+        <div><span>Transactions</span><strong>{{vm.report.transactions}}</strong></div>
+        <div><span>Net sales</span><strong>{{vm.report.netSalesCents | money}}</strong></div>
+        <div><span>Gross margin</span><strong>{{vm.report.grossMarginCents | money}} ({{vm.marginPct()}}%)</strong></div>
+        <div><span>Tax collected</span><strong>{{vm.report.taxCents | money}}</strong></div>
+        <div><span>Discounts</span><strong>{{vm.report.discountCents | money}}</strong></div>
+        <div><span>Refunds</span><strong>{{vm.report.refundsCents | money}}</strong></div>
+    </div>
+    <div class="split" ng-if="vm.report">
+        <div>
+            <h3>Tenders</h3>
+            <table class="table"><tr ng-repeat="(method, cents) in vm.report.tenderTotals"><td>{{method}}</td><td class="num">{{cents | money}}</td></tr></table>
+        </div>
+        <div>
+            <h3>Top items</h3>
+            <table class="table">
+                <tr ng-repeat="i in vm.report.topItems"><td>{{i.name}}</td><td class="num">{{i.units}}</td><td class="num">{{i.revenueCents | money}}</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
