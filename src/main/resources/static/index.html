@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="shopkeep">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ShopKeep POS</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body ng-controller="ShellCtrl">
+<header class="topbar">
+    <strong>ShopKeep</strong>
+    <nav>
+        <a href="#!/register" ng-class="{active: isActive('/register')}">Register</a>
+        <a href="#!/sales" ng-class="{active: isActive('/sales')}">Receipts</a>
+        <a href="#!/products" ng-show="me.manager" ng-class="{active: isActive('/products')}">Products</a>
+        <a href="#!/reports" ng-show="me.manager" ng-class="{active: isActive('/reports')}">Reports</a>
+    </nav>
+    <span class="user">{{me.username}} <a href="/logout">log out</a></span>
+</header>
+<div class="toast" ng-show="toast" ng-class="toast.kind">{{toast.text}}</div>
+<main ng-view></main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+<script src="/app/app.js"></script>
+<script src="/app/services.js"></script>
+<script src="/app/register.js"></script>
+<script src="/app/products.js"></script>
+<script src="/app/sales.js"></script>
+<script src="/app/reports.js"></script>
+</body>
+</html>
