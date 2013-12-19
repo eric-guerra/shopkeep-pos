@@ -1,0 +1,37 @@
+<div class="split">
+    <section class="panel">
+        <form class="row" ng-submit="vm.open(vm.lookup)">
+            <input ng-model="vm.lookup" placeholder="Receipt number (e.g. R260101-0001)">
+            <button>Open</button>
+        </form>
+        <table class="table">
+            <thead><tr><th>Receipt</th><th>Time</th><th>Cashier</th><th>Status</th><th class="num">Total</th></tr></thead>
+            <tbody>
+            <tr ng-repeat="s in vm.page.content" ng-click="vm.open(s.receiptNo)" class="clickable">
+                <td>{{s.receiptNo}}</td><td>{{s.createdAt | date:'short'}}</td><td>{{s.cashier}}</td>
+                <td><span class="badge" ng-class="s.status">{{s.status}}</span></td>
+                <td class="num">{{s.totalCents | money}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel" ng-if="vm.selected">
+        <h2>{{vm.selected.receiptNo}} <span class="badge" ng-class="vm.selected.status">{{vm.selected.status}}</span></h2>
+        <table class="table">
+            <thead><tr><th>Item</th><th class="num">Sold</th><th class="num">Returned</th><th>Return</th></tr></thead>
+            <tr ng-repeat="l in vm.selected.lines">
+                <td>{{l.name}}<div class="muted">{{l.sku}}</div></td>
+                <td class="num">{{l.quantity}}</td>
+                <td class="num">{{l.returnedQuantity}}</td>
+                <td><input type="number" min="0" max="{{l.quantity - l.returnedQuantity}}" ng-model="vm.returnQty[l.id]"
+                           ng-disabled="l.quantity === l.returnedQuantity || vm.selected.status === 'VOIDED'" class="qty"></td>
+            </tr>
+        </table>
+        <p>Total {{vm.selected.totalCents | money}} · Refunded {{vm.selected.refundedCents | money}} · {{vm.selected.paymentMethod}}</p>
+        <div class="row">
+            <button class="primary" ng-click="vm.processReturn()" ng-disabled="vm.selected.status === 'VOIDED'">Process return</button>
+            <button class="danger" ng-show="me.manager && vm.selected.status === 'COMPLETED'" ng-click="vm.voidSale()">Void sale</button>
+        </div>
+    </section>
+</div>
