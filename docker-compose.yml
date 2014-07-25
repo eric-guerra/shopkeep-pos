@@ -1,0 +1,15 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: shopkeep
+      MYSQL_USER: shopkeep
+      MYSQL_PASSWORD: shopkeep
+      MYSQL_ROOT_PASSWORD: root
+    ports: ["3306:3306"]
+  app:
+    build: .
+    depends_on: [mysql]
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/shopkeep?serverTimezone=UTC
+    ports: ["8080:8080"]
